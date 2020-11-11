@@ -1,7 +1,9 @@
 # slslog
 
 ## Overview
-AWS Lambda の標準出力に吐かれたログを Cloudwatch Logs Insight で trace して一連の処理を追うことのできるための Logger です。
+AWS Lambda の標準出力に吐かれたログを Cloudwatch Logs Insight で trace 付きで一連の処理を追うことのできるための Logger です。
+
+This is inspired by https://github.com/DeNA/aelog.
 
 ## Usage
 
