@@ -1,3 +1,14 @@
+/* Package slslog provides the trackable log output with using trace on AWS CloudWatch Logs.
+
+Example:
+	slslog.SetLogLabel("serviceLabel")
+    span := slslog.StartSpan(context.Background(), "serviceLabel")
+    defer span.End()
+
+    ctx := span.Context()
+    Infof(ctx, "this is slslog output")
+*/
+
 package slslog
 
 import (
