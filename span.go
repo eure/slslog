@@ -12,7 +12,7 @@ type Span struct {
 	span *trace.Span
 }
 
-// StartSpan starts a new span of the current span in the context.
+// StartSpan starts a new span from the current span in the given context.
 //
 // This returns the new span which has a new child span and the context.
 // which contains the newly created span in the span, and you are able
