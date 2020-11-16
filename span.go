@@ -26,7 +26,7 @@ func StartSpan(ctx context.Context, label string) *Span {
 	}
 }
 
-// Context returns the span context with the given Span attached.
+// Context returns the span context attached to Span.
 func (s *Span) Context() context.Context {
 	return s.ctx
 }
