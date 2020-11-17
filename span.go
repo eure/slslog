@@ -6,7 +6,7 @@ import (
 	"go.opencensus.io/trace"
 )
 
-// slslog.Span is wrapper of go.opencensus.io/trace.Span.
+// Span is wrapper of go.opencensus.io/trace.Span.
 type Span struct {
 	ctx  context.Context
 	span *trace.Span
