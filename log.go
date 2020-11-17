@@ -2,8 +2,8 @@
 
 Example:
 
-	slslog.SetLogLabel("serviceLabel")
-	span := slslog.StartSpan(context.Background(), "serviceLabel")
+	slslog.SetLogLabel("log label")                              // e.g. program name
+	span := slslog.StartSpan(context.Background(), "span label") // e.g. func name
 	defer span.End()
 
 	ctx := span.Context()
