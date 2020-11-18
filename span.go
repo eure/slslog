@@ -12,10 +12,9 @@ type Span struct {
 	span *trace.Span
 }
 
-// StartSpan starts a new span from the current span in the given context.
-//
-// This returns the new span which has a new child span and the context.
-// This span can be propagated to the subsequent process by using returned
+// StartSpan starts a new span from the current span in the given context
+// and returns it as Span.
+// This span can be propagated to the subsequent process by using span's
 // context.
 func StartSpan(ctx context.Context, label string) *Span {
 	ctx, span := trace.StartSpan(ctx, label)
