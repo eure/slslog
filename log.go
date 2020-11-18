@@ -1,3 +1,15 @@
+/* Package slslog provides the trackable log output with using trace on AWS CloudWatch Logs.
+
+Example:
+
+	slslog.SetLogLabel("log label")                              // e.g. program name
+	span := slslog.StartSpan(context.Background(), "span label") // e.g. func name
+	defer span.End()
+
+	ctx := span.Context()
+	Infof(ctx, "this is slslog output")
+*/
+
 package slslog
 
 import (
@@ -49,18 +61,23 @@ func (l *logger) output(ctx context.Context, severity, format string, a ...inter
 	fmt.Println(string(b))
 }
 
+// Infof formats its arguments according to the format like fmt.Printf,
+// and records the text as log message at Info level.
 func Infof(ctx context.Context, format string, a ...interface{}) {
 	std.output(ctx, "INFO", format, a...)
 }
 
+// Warningf is like Infof, but the severity is warning level.
 func Warningf(ctx context.Context, format string, a ...interface{}) {
 	std.output(ctx, "WARNING", format, a...)
 }
 
+// Errorf is like Infof, but the severity is error level.
 func Errorf(ctx context.Context, format string, a ...interface{}) {
 	std.output(ctx, "ERROR", format, a...)
 }
 
+// Criticalf is like Infof, but the severity is critical level.
 func Criticalf(ctx context.Context, format string, a ...interface{}) {
 	std.output(ctx, "CRITICAL", format, a...)
 }
