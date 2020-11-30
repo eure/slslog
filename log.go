@@ -1,4 +1,4 @@
-/* Package slslog provides the trackable log output with using trace on AWS CloudWatch Logs.
+/* Package slslog provides the trackable log output with tracing on AWS CloudWatch Logs.
 
 Example:
 
