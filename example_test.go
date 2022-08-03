@@ -3,11 +3,13 @@ package slslog
 import (
 	"context"
 
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func ExampleInfof() {
-	ctx := trace.NewContext(context.Background(), nil)
+	parent := context.Background()
+	s := trace.SpanFromContext(parent)
+	ctx := trace.ContextWithSpan(parent, s)
 	Infof(ctx, "%s", "test")
 
 	// Output:
@@ -15,7 +17,9 @@ func ExampleInfof() {
 }
 
 func ExampleWarningf() {
-	ctx := trace.NewContext(context.Background(), nil)
+	parent := context.Background()
+	s := trace.SpanFromContext(parent)
+	ctx := trace.ContextWithSpan(parent, s)
 	Warningf(ctx, "%s", "test")
 
 	// Output:
@@ -23,7 +27,9 @@ func ExampleWarningf() {
 }
 
 func ExampleErrorf() {
-	ctx := trace.NewContext(context.Background(), nil)
+	parent := context.Background()
+	s := trace.SpanFromContext(parent)
+	ctx := trace.ContextWithSpan(parent, s)
 	Errorf(ctx, "%s", "test")
 
 	// Output:
@@ -31,7 +37,9 @@ func ExampleErrorf() {
 }
 
 func ExampleCriticalf() {
-	ctx := trace.NewContext(context.Background(), nil)
+	parent := context.Background()
+	s := trace.SpanFromContext(parent)
+	ctx := trace.ContextWithSpan(parent, s)
 	Criticalf(ctx, "%s", "test")
 
 	// Output:
