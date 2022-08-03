@@ -8,7 +8,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// Span wraps go.opencensus.io/trace.Span.
+// Span wraps go.opentelemetry.io/otel/trace.Span.
 type Span struct {
 	ctx  context.Context
 	span trace.Span
