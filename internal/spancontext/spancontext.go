@@ -3,7 +3,8 @@ package spancontext
 import (
 	"context"
 
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 type LogSpanContext struct {
@@ -12,9 +13,13 @@ type LogSpanContext struct {
 }
 
 func Get(ctx context.Context) *LogSpanContext {
-	sc := trace.FromContext(ctx).SpanContext()
+	tp := sdktrace.NewTraceProvider()
+	otel.SetTracerProvider(tp)
+	_, span := otel.Tracer("github.com/slslog").Start(ctx, "logging")
+	sc := span.SpanContext()
+
 	return &LogSpanContext{
-		SpanID:  sc.SpanID.String(),
-		TraceID: sc.TraceID.String(),
+		SpanID:  sc.SpanID().String(),
+		TraceID: sc.TraceID().String(),
 	}
 }
