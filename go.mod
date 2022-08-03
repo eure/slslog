@@ -1,6 +1,6 @@
 module github.com/eure/slslog
 
-go 1.18
+go 1.19
 
 require go.opencensus.io v0.23.0
 
