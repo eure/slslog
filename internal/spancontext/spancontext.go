@@ -13,7 +13,7 @@ type LogSpanContext struct {
 }
 
 func Get(ctx context.Context) *LogSpanContext {
-	tp := sdktrace.NewTraceProvider()
+	tp := sdktrace.NewTracerProvider()
 	otel.SetTracerProvider(tp)
 	_, span := otel.Tracer("github.com/slslog").Start(ctx, "logging")
 	sc := span.SpanContext()
