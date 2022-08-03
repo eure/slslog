@@ -21,7 +21,7 @@ type Span struct {
 func StartSpan(ctx context.Context, label string) *Span {
 	tp := sdktrace.NewTracerProvider()
 	otel.SetTracerProvider(tp)
-	ctx, span := otel.Tracer("github.com/slslog").Start(ctx, "slslog")
+	ctx, span := otel.Tracer("github.com/slslog").Start(ctx, label)
 	return &Span{
 		ctx:  ctx,
 		span: span,
