@@ -3,8 +3,7 @@ package spancontext
 import (
 	"context"
 
-	"go.opentelemetry.io/otel"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type LogSpanContext struct {
@@ -13,10 +12,7 @@ type LogSpanContext struct {
 }
 
 func Get(ctx context.Context) *LogSpanContext {
-	tp := sdktrace.NewTracerProvider()
-	otel.SetTracerProvider(tp)
-	_, span := otel.Tracer("github.com/slslog").Start(ctx, "logging")
-	sc := span.SpanContext()
+	sc := trace.SpanContextFromContext(ctx)
 
 	return &LogSpanContext{
 		SpanID:  sc.SpanID().String(),

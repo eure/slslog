@@ -3,13 +3,15 @@ package slslog
 import (
 	"context"
 
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Span wraps go.opencensus.io/trace.Span.
 type Span struct {
 	ctx  context.Context
-	span *trace.Span
+	span trace.Span
 }
 
 // StartSpan starts a new span from the current span in the given context
@@ -17,7 +19,9 @@ type Span struct {
 // This span can be propagated to the subsequent process by using span's
 // context.
 func StartSpan(ctx context.Context, label string) *Span {
-	ctx, span := trace.StartSpan(ctx, label)
+	tp := sdktrace.NewTracerProvider()
+	otel.SetTracerProvider(tp)
+	ctx, span := otel.Tracer("github.com/slslog").Start(ctx, "slslog")
 	return &Span{
 		ctx:  ctx,
 		span: span,
