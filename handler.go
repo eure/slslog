@@ -1,11 +1,10 @@
 package slslog
 
 import (
-	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
-	"slices"
 )
 
 type slsLogHandler struct {
@@ -22,33 +21,20 @@ func (h *slsLogHandler) Handle(ctx context.Context, r slog.Record) error {
 		r.AddAttrs(slog.String("severity", r.Level.String()))
 	}
 
-	num := r.NumAttrs()
-	buf := bytes.NewBuffer(nil)
-	buf.WriteString("{")
-	for i, attr := range slices.Collect(r.Attrs) {
-		if attr.Key == "msg" {
-			continue
+	var out string
+	r.Attrs(func(attr slog.Attr) bool {
+		if attr.Key != "level" && attr.Key != "msg" && attr.Key != "time" {
+			out += fmt.Sprintf(`"%s":"%v",`, attr.Key, attr.Value)
 		}
-		if attr.Key == "time" {
-			continue
-		}
-		if attr.Key == "level" {
-			continue
-		}
-		buf.WriteString("\"")
-		buf.WriteString(attr.Key)
-		buf.WriteString("\":")
-		buf.WriteString("\"")
-		buf.WriteString(attr.Value.String())
-		if i == num-1 {
-			buf.WriteString("\"")
-			break
-		}
-		buf.WriteString("\",")
+		return true
+	})
+
+	if len(out) > 0 {
+		out = out[:len(out)-1]
 	}
-	buf.WriteString("}\n")
-	_, err := h.w.Write(buf.Bytes())
-	return err
+
+	fmt.Printf("{%+v}", out)
+	return nil
 }
 
 func (h *slsLogHandler) Enabled(context.Context, slog.Level) bool {
