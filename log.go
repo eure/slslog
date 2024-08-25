@@ -16,7 +16,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"os"
 	"sync"
 
 	"github.com/eure/slslog/internal/spancontext"
@@ -30,9 +29,7 @@ type logger struct {
 
 var std = &logger{
 	label: "slslog",
-	c: slog.New(&slsLogHandler{
-		w: os.Stdout,
-	}),
+	c:     slog.New(&slsLogHandler{}),
 }
 
 func SetLogLabel(label string) {

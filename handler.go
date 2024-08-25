@@ -3,14 +3,13 @@ package slslog
 import (
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
+	"os"
 )
 
 type slsLogHandler struct {
 	attrs  []slog.Attr
 	groups []string
-	w      io.Writer
 }
 
 func (h *slsLogHandler) Handle(ctx context.Context, r slog.Record) error {
@@ -26,10 +25,8 @@ func (h *slsLogHandler) Handle(ctx context.Context, r slog.Record) error {
 		out = out[:len(out)-1]
 	}
 
-	out = fmt.Sprint("{" + out + "}")
-	fmt.Println(out)
-	_, err := h.w.Write([]byte(out + "\n"))
-	return err
+	fmt.Fprintf(os.Stdout, "{%s}\n", out)
+	return nil
 }
 
 func (h *slsLogHandler) Enabled(context.Context, slog.Level) bool {
