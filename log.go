@@ -31,7 +31,7 @@ type logger struct {
 var std = &logger{
 	label: "slslog",
 	c: slog.New(&slsLogHandler{
-		w: os.Stdout,
+		handler: slog.NewJSONHandler(os.Stderr, nil),
 	}),
 }
 
