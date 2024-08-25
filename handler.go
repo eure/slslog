@@ -13,6 +13,8 @@ type slsLogHandler struct {
 }
 
 func (h *slsLogHandler) Handle(ctx context.Context, r slog.Record) error {
+	r.AddAttrs(h.attrs...)
+
 	var out string
 	r.Attrs(func(attr slog.Attr) bool {
 		if attr.Key != "level" && attr.Key != "msg" && attr.Key != "time" {
@@ -20,7 +22,6 @@ func (h *slsLogHandler) Handle(ctx context.Context, r slog.Record) error {
 		}
 		return true
 	})
-
 	if len(out) > 0 {
 		out = out[:len(out)-1]
 	}
