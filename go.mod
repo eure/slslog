@@ -1,6 +1,6 @@
 module github.com/eure/slslog
 
-go 1.20
+go 1.23.0
 
 require (
 	go.opentelemetry.io/otel v1.9.0
