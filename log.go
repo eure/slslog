@@ -45,12 +45,21 @@ func (l *logger) output(ctx context.Context, level slog.Level, format string, a 
 	std.mu.Lock()
 	defer std.mu.Unlock()
 
+	sev := level.String()
+	switch level {
+	case slog.LevelWarn:
+		sev = "WARNING"
+	case levelCritical.Level():
+		sev = "CRITICAL"
+	}
+
 	msg := fmt.Sprintf(format, a...)
 	sc := spancontext.Get(ctx)
 	l.c.LogAttrs(ctx, level, msg,
+		slog.String("severity", sev),
+		slog.String("message", msg),
 		slog.String("trace", fmt.Sprintf("service/%s/trace/%s", l.label, sc.TraceID)),
 		slog.String("span", fmt.Sprintf("service/%s/span/%s", l.label, sc.SpanID)),
-		slog.String("message", msg),
 	)
 }
 

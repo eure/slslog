@@ -13,7 +13,7 @@ func ExampleInfof() {
 	Infof(ctx, "%s", "test")
 
 	// Output:
-	// {"trace":"service/slslog/trace/00000000000000000000000000000000","span":"service/slslog/span/0000000000000000","message":"test","severity":"INFO"}
+	// {"severity":"INFO","message":"test","trace":"service/slslog/trace/00000000000000000000000000000000","span":"service/slslog/span/0000000000000000"}
 }
 
 func ExampleWarningf() {

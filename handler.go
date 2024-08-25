@@ -14,13 +14,6 @@ type slsLogHandler struct {
 }
 
 func (h *slsLogHandler) Handle(ctx context.Context, r slog.Record) error {
-	switch r.Level {
-	case levelCritical.Level():
-		r.AddAttrs(slog.String("severity", "CRITICAL"))
-	default:
-		r.AddAttrs(slog.String("severity", r.Level.String()))
-	}
-
 	var out string
 	r.Attrs(func(attr slog.Attr) bool {
 		if attr.Key != "level" && attr.Key != "msg" && attr.Key != "time" {
@@ -33,8 +26,10 @@ func (h *slsLogHandler) Handle(ctx context.Context, r slog.Record) error {
 		out = out[:len(out)-1]
 	}
 
-	fmt.Printf("{%+v}", out)
-	return nil
+	out = fmt.Sprint("{" + out + "}")
+	fmt.Println(out)
+	_, err := h.w.Write([]byte(out + "\n"))
+	return err
 }
 
 func (h *slsLogHandler) Enabled(context.Context, slog.Level) bool {
