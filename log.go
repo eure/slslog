@@ -14,8 +14,9 @@ package slslog
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"log/slog"
+	"os"
 	"sync"
 
 	"github.com/eure/slslog/internal/spancontext"
@@ -24,10 +25,19 @@ import (
 type logger struct {
 	mu    sync.Mutex
 	label string
+	c     *slog.Logger
 }
 
 var std = &logger{
 	label: "slslog",
+	c: slog.New(&slsLogHandler{
+		handler: slog.NewJSONHandler(
+			os.Stdout,
+			&slog.HandlerOptions{
+				Level: &levelCritical,
+			},
+		),
+	}),
 }
 
 func SetLogLabel(label string) {
@@ -36,48 +46,36 @@ func SetLogLabel(label string) {
 	std.label = label
 }
 
-func (l *logger) output(ctx context.Context, severity, format string, a ...interface{}) {
+func (l *logger) output(ctx context.Context, level slog.Level, format string, a ...interface{}) {
 	std.mu.Lock()
 	defer std.mu.Unlock()
 
+	msg := fmt.Sprintf(format, a...)
 	sc := spancontext.Get(ctx)
-	payload := struct {
-		Severity string `json:"severity"`
-		Message  string `json:"message"`
-		Trace    string `json:"trace"`
-		Span     string `json:"span"`
-	}{
-		Severity: severity,
-		Message:  fmt.Sprintf(format, a...),
-		Trace:    fmt.Sprintf("service/%s/trace/%s", l.label, sc.TraceID),
-		Span:     fmt.Sprintf("service/%s/span/%s", l.label, sc.SpanID),
-	}
-
-	b, err := json.Marshal(payload)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(b))
+	l.c.LogAttrs(ctx, level, msg,
+		slog.String("trace", fmt.Sprintf("service/%s/trace/%s", l.label, sc.TraceID)),
+		slog.String("span", fmt.Sprintf("service/%s/span/%s", l.label, sc.SpanID)),
+		slog.String("message", msg),
+	)
 }
 
 // Infof formats its arguments according to the format like fmt.Printf,
 // and records the text as log message at Info level.
 func Infof(ctx context.Context, format string, a ...interface{}) {
-	std.output(ctx, "INFO", format, a...)
+	std.output(ctx, slog.LevelInfo, format, a...)
 }
 
 // Warningf is like Infof, but the severity is warning level.
 func Warningf(ctx context.Context, format string, a ...interface{}) {
-	std.output(ctx, "WARNING", format, a...)
+	std.output(ctx, slog.LevelWarn, format, a...)
 }
 
 // Errorf is like Infof, but the severity is error level.
 func Errorf(ctx context.Context, format string, a ...interface{}) {
-	std.output(ctx, "ERROR", format, a...)
+	std.output(ctx, slog.LevelError, format, a...)
 }
 
 // Criticalf is like Infof, but the severity is critical level.
 func Criticalf(ctx context.Context, format string, a ...interface{}) {
-	std.output(ctx, "CRITICAL", format, a...)
+	std.output(ctx, levelCritical.Level(), format, a...)
 }
