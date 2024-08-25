@@ -1,14 +1,17 @@
 package slslog
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"log/slog"
+	"slices"
 )
 
 type slsLogHandler struct {
-	handler slog.Handler
-	attrs   []slog.Attr
-	groups  []string
+	attrs  []slog.Attr
+	groups []string
+	w      io.Writer
 }
 
 func (h *slsLogHandler) Handle(ctx context.Context, r slog.Record) error {
@@ -18,8 +21,11 @@ func (h *slsLogHandler) Handle(ctx context.Context, r slog.Record) error {
 	default:
 		r.AddAttrs(slog.String("severity", r.Level.String()))
 	}
-	a := make([]slog.Attr, 0, r.NumAttrs())
-	for attr := range r.Attrs {
+
+	num := r.NumAttrs()
+	buf := bytes.NewBuffer(nil)
+	buf.WriteString("{")
+	for i, attr := range slices.Collect(r.Attrs) {
 		if attr.Key == "msg" {
 			continue
 		}
@@ -29,9 +35,20 @@ func (h *slsLogHandler) Handle(ctx context.Context, r slog.Record) error {
 		if attr.Key == "level" {
 			continue
 		}
-		a = append(a, attr)
+		buf.WriteString("\"")
+		buf.WriteString(attr.Key)
+		buf.WriteString("\":")
+		buf.WriteString("\"")
+		buf.WriteString(attr.Value.String())
+		if i == num-1 {
+			buf.WriteString("\"")
+			break
+		}
+		buf.WriteString("\",")
 	}
-	return h.handler.Handle(ctx, r)
+	buf.WriteString("}\n")
+	_, err := h.w.Write(buf.Bytes())
+	return err
 }
 
 func (h *slsLogHandler) Enabled(context.Context, slog.Level) bool {
@@ -40,14 +57,12 @@ func (h *slsLogHandler) Enabled(context.Context, slog.Level) bool {
 
 func (h *slsLogHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &slsLogHandler{
-		handler: h.handler,
-		attrs:   attrs,
+		attrs: attrs,
 	}
 }
 
 func (h *slsLogHandler) WithGroup(group string) slog.Handler {
 	return &slsLogHandler{
-		handler: h.handler,
-		groups:  append(h.groups, group),
+		groups: append(h.groups, group),
 	}
 }
